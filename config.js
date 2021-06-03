@@ -1,3 +1,6 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 try {
     switch (process.env.NODE_ENV) {
         case 'development':
@@ -18,4 +21,9 @@ global.Module = {
       console.log('opencv.js is loaded...')
     }
 }
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+process.env.DIR_NAME = __dirname;
+
 export default process.env;

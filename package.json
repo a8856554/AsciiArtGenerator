@@ -7,6 +7,8 @@
     "start": "node ./server.js"
   },
   "dependencies": {
+    "@tensorflow/tfjs": "^3.6.0",
+    "@tensorflow/tfjs-node": "^3.6.1",
     "canny-edge-detector": "^1.0.0",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",

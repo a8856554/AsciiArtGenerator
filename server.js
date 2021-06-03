@@ -6,17 +6,17 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
-// Define a global variable 'Module' with a method 'onRuntimeInitialized':
+import * as cv from './src/javascript/opencv.js';
+
 
 import indexRouter from './routes/index.js';
 import userRouter from './routes/users.js';
 import asciiArtRouter from './routes/asciiArt.js';
-import * as cv from './src/javascript/opencv.js';
-
+import tensorflowModel from './src/javascript/loadTFModel.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-process.env.DIR_NAME = __dirname;
+//process.env.DIR_NAME = __dirname;
 
 const corsOptions = {
     origin: [
@@ -30,7 +30,10 @@ const corsOptions = {
 if (!global.cv) {
   global.cv = cv;
 }
-  
+
+if(!global.tfModel){
+  global.tfModel = tensorflowModel
+}
 
 const app = express();
 // view engine setup
