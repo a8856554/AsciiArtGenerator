@@ -72,10 +72,6 @@ let cnnStragegy = {
   }
 };
 
-let tensorflowStrategy = {
-  "nn" : nnStragegy,
-  "cnn" : cnnStragegy
-};
 */
 class nnStragegy extends DeepLearningStrategy{
 

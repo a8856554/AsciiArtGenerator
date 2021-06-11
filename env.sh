@@ -5,9 +5,9 @@ cmd //C "chcp 65001"
 export NODE_ENV=development
 export PG_HOSTNAME=localhost
 export PG_PORT=5432
-export PG_USERNAME=postgres
-export PG_USERPASSPORT=a32156
-export PG_DB_NAME=gmaildb
+export PG_USERNAME=aadb_backend
+export PG_USERPASSPORT=a8856554
+export PG_DB_NAME=aadb
 # PG_SECRET is for login JWT.
 export PG_SECRET=GFEtrwbQ48BTR
 # PG_SALT_ROUNDS is for bcrypt.

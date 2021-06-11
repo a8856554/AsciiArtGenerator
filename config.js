@@ -18,7 +18,7 @@ try {
 global.Module = {
     onRuntimeInitialized() {
       // Do something after opencv.js is Initialized.
-      console.log('opencv.js is loaded...')
+      console.log('opencv.js is loaded.')
     }
 }
 
