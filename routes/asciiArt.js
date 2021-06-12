@@ -2,13 +2,14 @@ import express from 'express';
 import path from 'path';
 import Image_js from 'image-js';
 import multer  from 'multer';
-import * as tf from '@tensorflow/tfjs-node';
-import sharp from 'sharp';
+//import * as tf from '@tensorflow/tfjs-node';
+//import sharp from 'sharp';
 import Jimp from 'jimp';
+import fs from 'fs/promises';
 
-import image2Canny from '../controllers/image2Canny.js';
+import image2Canny from '../models/image2Canny.js';
 import AsciiGenerator from '../controllers/AsciiGenerator.js';
-import tensorflowStrategies from '../controllers/stragegy/deeplearning/tensorflowStrategies.js'
+import tensorflowStrategies from '../models/stragegy/deeplearning/tensorflowStrategies.js'
 
 const Image = Image_js.Image;
 let imageSavePath = './images/public/';
@@ -123,10 +124,17 @@ router.post('/' ,upload.any(), async function(req, res, next) {
   outputImage.bitmap.data = dst.data;
   outputImage.write(writeImagePath);
   
-  res.json({ ascii_art: sub_image_array })
+  res.json({ ascii_art: sub_image_array });
   
   // remember to free the memory
   dst.delete();
+  // remove temporary image.
+  try {
+    fs.unlink(publicImagePath)
+    //file removed
+  } catch(err) {
+    console.error(err)
+  }
 
 });
 export default router;

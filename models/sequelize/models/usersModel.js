@@ -13,6 +13,11 @@ function init( sequelize){
   
   model = sequelize.define(name, {
         // Model attributes are defined here
+        id: {
+          type: Sequelize.UUID,
+          primaryKey: true,
+          defaultValue: Sequelize.UUIDV4
+        },
         user_name: {
             type: DataTypes.STRING,
             allowNull: false

@@ -1,4 +1,4 @@
-import DeepLearningStrategy from './stragegy/deeplearning/DeepLearningStrategy.js'
+import DeepLearningStrategy from '../models/stragegy/deeplearning/DeepLearningStrategy.js'
 
 /**
   * A class generate ascii characters by different machine learning strategy .
