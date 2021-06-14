@@ -28,12 +28,13 @@ async function loadModelAsync(models_path){
   }
   await Promise.all(promise_array);
 
-  await applyExtraSetup(db);
+  applyExtraSetup(db);
 
   Object.keys(db).forEach(modelName => {
     //sync() every model
     db[modelName].model.sync();
   });
+  
 
   db.sequelize = sequelize;
   db.Sequelize = Sequelize;
@@ -44,6 +45,7 @@ async function importModelAsync(file){
   let model = await import(path.join('file://',models_path, file));
   let m = await model.init(sequelize);
   db[model.name] = model;
+
   //db[model.name].model = m;
 }
   

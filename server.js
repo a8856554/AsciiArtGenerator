@@ -60,10 +60,9 @@ app.use('/users', usersRouter);
 app.use('/asciiArt', asciiArtRouter);
 app.use('/register', registerRouter);
 app.use('/login', loginRouter);
-
-app.use(tokenVerify);
 app.use('/posts', postsRouter);
 
+app.use(tokenVerify);
 app.use(cors(corsOptions));
 
 const port = 3000;

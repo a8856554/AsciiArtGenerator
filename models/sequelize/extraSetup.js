@@ -10,7 +10,15 @@ async function applyExtraSetup(db) {
     let Posts = db["Posts"].model;
     // Posts has a UserId column which stores Users id
     // target = Users
-    Users.hasMany(Posts, {foreignKey: 'user_id'});
+
+    
+    try {
+      Users.hasMany(Posts, {foreignKey: 'user_id'});
+    } catch(err) {
+      console.log(err)
+    }
+    //db["Users"].model.sync();
+    //db["Posts"].model.sync();
     //Posts.belongsTo(Users, {foreignKey: 'user_id'}); // Adds user_id to Posts // 屬於
 }
 

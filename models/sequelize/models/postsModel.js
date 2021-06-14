@@ -1,5 +1,11 @@
 import seq from 'sequelize';
+import pgPromise from 'pg-promise';
+
 const { Sequelize, DataTypes, Model } = seq;
+if (!global.db) {
+  const pgp = pgPromise({});
+  global.db = pgp(process.env.DB_URL);
+}
 
 const name = 'Posts';
 let model = {};
@@ -38,10 +44,18 @@ function init( sequelize){
       type: DataTypes.INTEGER,
       defaultValue: 0
     },
-   
+    ts: {
+      type: Sequelize.BIGINT,
+      defaultValue: sequelize.literal('extract(epoch from now())'),
+      allowNull: false
+    }
+    
     }, {
       // Other model options go here
-    
+
+      // auto generate "updatedAt", "createdAt" columns.
+      timestamps: false,  
+
       //let table name will be equal to the model name.
       freezeTableName: true
     }
@@ -61,7 +75,7 @@ function init( sequelize){
  * @param {string} image_path image_path is the path post's image refered to.
  * 
  */
-async function create(user_id, title, context, image_path){
+async function create(user_id, title, context, image_path = ''){
   return model.create({ user_id: user_id, title: title, context: context, image_path:image_path });
 }
 
@@ -71,8 +85,25 @@ async function create(user_id, title, context, image_path){
  * @param {array} search_words a string array contains search words.
  * @param {number} start start id of posts.
  */
- async function list(search_words = [], start){
+async function list(search_words = [], start){
+  const where = [];
+  if (search_words.length > 0){
+    for(let i = 0; i < search_words.length; i++){
+      where.push(`title ILIKE '%$${i+1}:value%'`);
+    }
+  }
   
+  // if number start exists, SELECT from id < start. The smaller the id is, the older the record is.
+  if (start)
+    where.push(`id < $${search_words.length + 1}`);
+  const sql = `
+    SELECT *
+    FROM "Posts"
+    ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
+    ORDER BY id DESC
+    LIMIT 3
+  `;
+  return db.any(sql, [...search_words, start]);
 }
 
 export{
