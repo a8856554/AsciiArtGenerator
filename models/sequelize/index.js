@@ -28,7 +28,7 @@ async function loadModelAsync(models_path){
   }
   await Promise.all(promise_array);
 
-  applyExtraSetup(db);
+  applyExtraSetup(db, sequelize);
 
   Object.keys(db).forEach(modelName => {
     //sync() every model

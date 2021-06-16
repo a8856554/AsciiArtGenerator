@@ -24,7 +24,7 @@ var upload = multer({
     }
   ), 
 });
-
+/*
 // receive an image and an ascii string to create an user post.
 // To use this API, logining in is necessary.
 router.post('/',tokenVerify ,upload.any(), async function(req, res, next) {
@@ -55,9 +55,47 @@ router.post('/',tokenVerify ,upload.any(), async function(req, res, next) {
       message: `Error occurs ${err}`
     });
   }
+});
+*/
+// receive an image and an ascii string to create an user post.
+// 
+router.post('/',tokenVerify ,upload.any(), async function(req, res, next) {
+  const user_id = req.decoded.id;
+  let publicImagePath = '';
+
+  // image infomation.
+  if(req.files[0]){
+    const { filename, mimetype, size } = req.files[0];
+    publicImagePath = path.join(process.env.DIR_NAME, imageSavePath, filename);
+  }
+  // other parameters
+  let { title, context , tags} = req.body;
   
 
+  if(!title || !context)
+    return res.status(400).send({
+      success: false,
+      message: `parameter title or context is not provided.`
+    });
+  
+  if(tags){
+    tags = tags.split("#");
+    // Remove the 1st element, since the 1st element in tags is "".
+    tags.shift();
+  }
     
+  
+  try {
+    const result = await sequelizeDB["Posts"].createWithTags(user_id, title, context ,publicImagePath,
+      Array.isArray(tags) ? tags : [] );
+    
+    res.json({ success: true, result: result });
+  } catch(err) {
+    res.status(400).send({
+      success: false,
+      message: `Error occurs ${err}`
+    });
+  }
 });
 
 /**
@@ -71,17 +109,22 @@ router.post('/',tokenVerify ,upload.any(), async function(req, res, next) {
 router.get('/', async function(req, res, next) {
   
   let {search_words, start} = req.query;
+
   if(search_words)
     search_words = search_words.split(" ");
   else
     search_words = [];
 
+  // Check start type, if it doesn't exist then assign it as NaN. If it is not a number return error.
   if(!start)
     start = NaN;
+  else
+    start = parseInt(start, 10);
   
   try {
-    let result = await sequelizeDB["Posts"].list(search_words, start);
-    const last_id = result[result.length - 1].id;
+    //let result = await sequelizeDB["Posts"].list(search_words, start);
+    let result = await sequelizeDB["Posts"].listWithTags(search_words, start);
+    const last_id = result.length > 0 ? result[result.length - 1].id : -1;
     res.json({ success: true, result: result , last_id: last_id});
   } catch(err) {
     res.status(400).send({
@@ -89,7 +132,6 @@ router.get('/', async function(req, res, next) {
       message: `Error occurs ${err}`
     });
   }
-    
 });
 
 // give a like to a post with id.

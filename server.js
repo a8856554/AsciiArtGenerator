@@ -10,7 +10,7 @@ import * as cv from './src/javascript/opencv.js';
 import sequelizeDB  from './models/sequelize/index.js';
 
 import indexRouter from './routes/index.js';
-import usersRouter from './routes/users.js';
+import userRouter from './routes/user.js';
 import asciiArtRouter from './routes/asciiArt.js';
 import registerRouter from './routes/register.js';
 import loginRouter from './routes/login.js';
@@ -56,13 +56,14 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/asciiArt', asciiArtRouter);
 app.use('/register', registerRouter);
 app.use('/login', loginRouter);
 app.use('/posts', postsRouter);
 
 app.use(tokenVerify);
+app.use('/user', userRouter);
+
 app.use(cors(corsOptions));
 
 const port = 3000;
