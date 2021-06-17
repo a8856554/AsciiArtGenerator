@@ -105,8 +105,23 @@ async function create(user_id, title, context, image_path = ''){
   return newPost;
 }
 
+/*
+
+SELECT a,
+       CASE WHEN a=1 THEN 'one'
+            WHEN a=2 THEN 'two'
+            ELSE 'other'
+       END
+    FROM test;
+
+
+  INSERT INTO "Posts" (user_id,title, context ,image_path) 
+    VALUES ('818bacf4-e564-4ab6-9557-5a14cafac644', 'raw sql test', 'pekopeko', '') RETURNING id;
+ */
+
+
 /**
- * list posts user searchs.
+ * list posts user searches.
  *
  * @param {array} search_words a string array contains search words.
  * @param {number} start start id of posts.
@@ -134,7 +149,7 @@ async function list(search_words = [], start){
 }
 
 /**
- * list posts wit tags user searchs.
+ * list posts with tags user searches.
  *
  * @param {array} search_words a string array contains search words.
  * @param {number} start start id of posts.
@@ -171,6 +186,7 @@ async function list(search_words = [], start){
     post_ids.push(posts[i].id);
   }
   
+  // For each post id, select tags correspond to it.
   const tag_sql = `
   SELECT pt."PostId", string_agg(tag_name, ',') as tags
     FROM "PostTags" pt INNER JOIN "Tags" t
@@ -178,7 +194,6 @@ async function list(search_words = [], start){
       GROUP BY pt."PostId"
        ORDER BY pt."PostId" DESC;
   `
-  
   let tags = await db.any(tag_sql);
 
   // Iterate posts and assign correct tags to it.
@@ -195,6 +210,24 @@ async function list(search_words = [], start){
   return posts;
 }
 /*
+
+SELECT id, title, image_path, context, like_num, views, ts, user_id, tags
+FROM "Posts" p LEFT JOIN (
+  SELECT pt."PostId", string_agg(tag_name, ', ') as tags
+  FROM "PostTags" pt INNER JOIN "Tags" t
+    ON pt."TagId" = t.id 
+      AND pt."PostId" IN(
+        SELECT id FROM "Posts"
+          WHERE title ILIKE '%peko%'
+        ORDER BY id DESC
+        LIMIT 20
+      ) 
+    GROUP BY pt."PostId"
+    ORDER BY pt."PostId" DESC
+  ) t
+  ON p.id = t."PostId" 
+  ORDER BY id DESC 
+  LIMIT 20
 `
 SELECT pt."PostId", string_agg(tag_name, ', ') as tags
   FROM "PostTags" pt INNER JOIN "Tags" t
@@ -215,6 +248,63 @@ SELECT *
     ON pt."TagId" = t.id
 `
 */
+
+/**
+ * list posts by tags user searches.
+ *
+ * @param {array} search_tags a string array contains search tags.
+ * @param {number} start start id of posts.
+ */
+async function listByTags(search_tags = [], start){
+  let where = [];
+  const element_num_limit = 10;
+
+  if (search_tags.length > 0){
+    for(let i = 0; i < search_tags.length; i++){
+      where.push(`t.tag_name ILIKE '%$${i+1}:value%'`);
+    }
+  }
+
+  // if number start exists, SELECT from id < start. The smaller the id is, the older the record is.
+  if (start)
+    where.push(`pt."PostId" < $${search_tags.length + 2}`);
+  const sql = `
+    SELECT * from "Posts"
+    WHERE id in(
+      SELECT "PostId"
+      FROM "PostTags" pt INNER JOIN "Tags" t
+        ON pt."TagId" = t.id AND ${where.length ? where.join(' AND ') : ''}
+      ORDER BY "PostId" DESC
+      LIMIT $${search_tags.length + 1}
+    )
+    ORDER BY id DESC
+  `;
+  return db.any(sql, [...search_tags, element_num_limit, start]);
+}
+
+/**
+
+SELECT * from "Posts"
+WHERE id in(
+  SELECT "PostId"
+  FROM "PostTags" pt INNER JOIN "Tags" t
+    ON pt."TagId" = t.id AND t.tag_name ILIKE '%peko%' AND pt."PostId" < 1010060
+      ORDER BY "PostId" DESC
+      LIMIT 3
+)
+ORDER BY id DESC
+
+
+
+// find #peko tag in which posts.
+
+SELECT *
+  FROM "PostTags" pt INNER JOIN "Tags" t
+    ON pt."TagId" = t.id AND t.tag_name ILIKE '%peko%' AND pt."PostId" < 1010060
+      ORDER BY "PostId" DESC
+      LIMIT 3
+*/
+
 export{
   model,
   name,
@@ -223,4 +313,5 @@ export{
   init,
   list,
   listWithTags,
+  listByTags,
 }

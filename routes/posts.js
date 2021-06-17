@@ -115,7 +115,7 @@ router.get('/', async function(req, res, next) {
   else
     search_words = [];
 
-  // Check start type, if it doesn't exist then assign it as NaN. If it is not a number return error.
+  // Check start type, if it doesn't exist then assign it as NaN.
   if(!start)
     start = NaN;
   else

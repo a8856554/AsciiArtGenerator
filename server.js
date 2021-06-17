@@ -15,6 +15,7 @@ import asciiArtRouter from './routes/asciiArt.js';
 import registerRouter from './routes/register.js';
 import loginRouter from './routes/login.js';
 import postsRouter from './routes/posts.js'
+import taggedPostsRouter from './routes/taggedPosts.js'
 
 import tensorflowModel from './src/javascript/loadTFModel.js';
 import tokenVerify from './middleware/tokenVerify.js';
@@ -60,6 +61,7 @@ app.use('/asciiArt', asciiArtRouter);
 app.use('/register', registerRouter);
 app.use('/login', loginRouter);
 app.use('/posts', postsRouter);
+app.use('/taggedPosts', taggedPostsRouter);
 
 app.use(tokenVerify);
 app.use('/user', userRouter);
