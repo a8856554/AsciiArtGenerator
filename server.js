@@ -14,8 +14,9 @@ import userRouter from './routes/user.js';
 import asciiArtRouter from './routes/asciiArt.js';
 import registerRouter from './routes/register.js';
 import loginRouter from './routes/login.js';
-import postsRouter from './routes/posts.js'
-import taggedPostsRouter from './routes/taggedPosts.js'
+import postsRouter from './routes/posts.js';
+import taggedPostsRouter from './routes/taggedPosts.js';
+import accessTokenRouter from './routes/accessToken.js';
 
 import tensorflowModel from './src/javascript/loadTFModel.js';
 import tokenVerify from './middleware/tokenVerify.js';
@@ -31,6 +32,7 @@ const corsOptions = {
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: ['Content-Type', 'Authorization'],
+	credentials: true,
 };
 
 if (!global.cv) {
@@ -55,18 +57,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors(corsOptions));
 
-app.use('/', indexRouter);
-app.use('/asciiArt', asciiArtRouter);
-app.use('/register', registerRouter);
-app.use('/login', loginRouter);
-app.use('/posts', postsRouter);
-app.use('/taggedPosts', taggedPostsRouter);
+app.use('/api', indexRouter);
+app.use('/api/asciiArt', asciiArtRouter);
+app.use('/api/register', registerRouter);
+app.use('/api/login', loginRouter);
+app.use('/api/posts', postsRouter);
+app.use('/api/taggedPosts', taggedPostsRouter);
+app.use('/api/accessToken', accessTokenRouter);
+
 
 app.use(tokenVerify);
-app.use('/user', userRouter);
+app.use('/api/user', userRouter);
 
-app.use(cors(corsOptions));
+
 
 const port = 3000;
 app.listen(port, () => {

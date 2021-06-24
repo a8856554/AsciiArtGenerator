@@ -135,7 +135,7 @@ router.get('/', async function(req, res, next) {
 });
 
 // give a like to a post with id.
-router.post('/:id', function(req, res, next) {
+router.post('/:id',async function(req, res, next) {
   const {id} = req.params;
   if (!id) {
       const err = new Error('Post ID is required');
@@ -143,6 +143,21 @@ router.post('/:id', function(req, res, next) {
       throw err;
   }
   
+});
+
+// Delete a post with id.
+router.delete('/:id', async function (req, res) {
+  const {id} = req.params;
+  try {
+    
+    let result = await sequelizeDB["Posts"].deleteById(id);
+    res.json({ success: true, result: result });
+  } catch(err) {
+    res.status(400).send({
+      success: false,
+      message: `Error occurs ${err}`
+    });
+  }
 });
 
 export default router;

@@ -5,7 +5,14 @@ var router = express.Router();
 router.get('/', async function(req, res, next) {
   const user_id = req.decoded.id;
   const user_name = req.decoded.user_name;
-  const result = await sequelizeDB["Users"].find(user_name);
+  
+  try {
+    var result = await sequelizeDB["Users"].find(user_name);
+  } catch(err) {
+    console.log(`Error occurs during getting user's profile :` + err);
+    return res.json({ success: false, result: {}});
+  }
+  
 
   
   res.json({ 

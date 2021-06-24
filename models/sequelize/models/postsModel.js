@@ -228,6 +228,8 @@ FROM "Posts" p LEFT JOIN (
   ON p.id = t."PostId" 
   ORDER BY id DESC 
   LIMIT 20
+
+
 `
 SELECT pt."PostId", string_agg(tag_name, ', ') as tags
   FROM "PostTags" pt INNER JOIN "Tags" t
@@ -305,6 +307,19 @@ SELECT *
       LIMIT 3
 */
 
+/**
+ * Delete a post by id
+ * 
+ * @param {number} post_id the id of the post user wants to delete
+ */
+async function deleteById(post_id){
+  const sql = `
+    DELETE FROM "PostTags" pt WHERE  pt."PostId" = $1;
+    DELETE FROM "Posts" p WHERE  p.id = $1;
+  `;
+  return db.any(sql, [post_id]);
+}
+
 export{
   model,
   name,
@@ -314,4 +329,5 @@ export{
   list,
   listWithTags,
   listByTags,
+  deleteById,
 }
