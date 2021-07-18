@@ -30,6 +30,7 @@ const corsOptions = {
     origin: [
         'http://localhost:3000',
       'http://localhost:3002',
+      'AsciiArtGenerator-dev.ap-east-1.elasticbeanstalk.com',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -81,7 +82,7 @@ app.use('/api/accessTokenAuth', accessTokenAuthRouter);
 
 
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server is up and running on port ${port}...`);
 });
