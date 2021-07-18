@@ -11,6 +11,7 @@ async function applyExtraSetup(db, sequelize) {
     let Users = db["Users"].model;
     let Posts = db["Posts"].model;
     let Tags = db["Tags"].model;
+    let PostLikes = db["PostLikes"].model;
 
     const PostTags = sequelize.define('PostTags', {
         PostId: {
@@ -34,12 +35,18 @@ async function applyExtraSetup(db, sequelize) {
         freezeTableName: true
       }
     );
-
+    
 
     try {
-      // Posts has a UserId column which stores Users id
+      // Posts has a user_id column which stores Users id
       Users.hasMany(Posts, {foreignKey: 'user_id'});
 
+      // PostLikes has user_id and post_id column which stores Users id and Posts id seperately.
+      Users.hasMany(PostLikes, {foreignKey: 'user_id'});
+      Posts.hasMany(PostLikes, {foreignKey: 'post_id'});
+
+
+      //Posts.sync({ alter: true });
       Tags.belongsToMany(Posts, { through: PostTags });
       Posts.belongsToMany(Tags, { through: PostTags });
       sequelize.sync();
@@ -47,9 +54,10 @@ async function applyExtraSetup(db, sequelize) {
     } catch(err) {
       console.log(err)
     }
+    
+    //Posts.belongsTo(Users, {foreignKey: 'user_id'}); // Adds user_id to Posts // 屬於
     //db["Users"].model.sync();
     //db["Posts"].model.sync();
-    //Posts.belongsTo(Users, {foreignKey: 'user_id'}); // Adds user_id to Posts // 屬於
 }
 
 export default applyExtraSetup;

@@ -69,7 +69,7 @@ router.post('/',tokenVerify ,upload.any(), async function(req, res, next) {
     publicImagePath = path.join(process.env.DIR_NAME, imageSavePath, filename);
   }
   // other parameters
-  let { title, context , tags} = req.body;
+  let { title, context , tags, width, height} = req.body;
   
 
   if(!title || !context)
@@ -78,15 +78,27 @@ router.post('/',tokenVerify ,upload.any(), async function(req, res, next) {
       message: `parameter title or context is not provided.`
     });
   
+  if(!typeof(width)=='number' || !typeof(height)=='number')
+    return res.status(400).send({
+      success: false,
+      message: `Please provide valid hieght and width.`
+    });
+  
   if(tags){
     tags = tags.split("#");
     // Remove the 1st element, since the 1st element in tags is "".
     tags.shift();
   }
-    
   
+  console.log(`${user_id} ${title} ${context} ${tags}`);
   try {
-    const result = await sequelizeDB["Posts"].createWithTags(user_id, title, context ,publicImagePath,
+    const result = await sequelizeDB["Posts"].createWithTags(
+      user_id, 
+      title, 
+      context , 
+      width, 
+      height, 
+      publicImagePath,
       Array.isArray(tags) ? tags : [] );
     
     res.json({ success: true, result: result });
@@ -124,9 +136,11 @@ router.get('/', async function(req, res, next) {
   try {
     //let result = await sequelizeDB["Posts"].list(search_words, start);
     let result = await sequelizeDB["Posts"].listWithTags(search_words, start);
+    
     const last_id = result.length > 0 ? result[result.length - 1].id : -1;
     res.json({ success: true, result: result , last_id: last_id});
   } catch(err) {
+    
     res.status(400).send({
       success: false,
       message: `Error occurs ${err}`
@@ -134,14 +148,49 @@ router.get('/', async function(req, res, next) {
   }
 });
 
-// give a like to a post with id.
-router.post('/:id',async function(req, res, next) {
+
+
+// update a post's likes
+router.put('/:id/like_num', tokenVerify, async function(req, res, next) {
+  const user_id = req.decoded.id;
   const {id} = req.params;
-  if (!id) {
-      const err = new Error('Post ID is required');
-      err.status = 400;
-      throw err;
+  
+  if (!id)   
+    return res.status(400).json({ success: false, message: 'Post ID is required' });
+  
+  let post = await sequelizeDB["Posts"].find(id);
+  let db_like = await sequelizeDB["PostLikes"].find(id, user_id);
+
+  if(!db_like){
+    sequelizeDB["PostLikes"].create(id, user_id);
+    post.like_num = post.like_num +1;
+  }   
+  else{
+    sequelizeDB["PostLikes"].deleteLike(id, user_id);
+    post.like_num = post.like_num -1;
   }
+  
+  await post.save();
+  res.json({ success: true, result: {like_num: post.like_num},message: `Update post ${id} successfully`});
+  
+});
+
+// update a post's views
+router.put('/:id/views', async function(req, res, next) {
+  const {id} = req.params;
+  
+
+  if (!id)   
+    return res.status(400).json({ success: false, message: 'Post ID is required' });
+  
+  let post = await sequelizeDB["Posts"].find(id);
+
+  if(post)
+    post.views = post.views +1;
+  
+  
+  await post.save();
+  res.json({ success: true, result: {views: post.views},message: `Update post ${id} successfully`});
   
 });
 

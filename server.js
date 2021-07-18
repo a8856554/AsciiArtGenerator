@@ -17,6 +17,7 @@ import loginRouter from './routes/login.js';
 import postsRouter from './routes/posts.js';
 import taggedPostsRouter from './routes/taggedPosts.js';
 import accessTokenRouter from './routes/accessToken.js';
+import accessTokenAuthRouter from './routes/accessTokenAuthentication.js';
 
 import tensorflowModel from './src/javascript/loadTFModel.js';
 import tokenVerify from './middleware/tokenVerify.js';
@@ -59,6 +60,13 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors(corsOptions));
 
+
+app.use(express.static('build', {
+  setHeaders: (res, path, stat) => {
+      res.set('Cache-Control', 'public, s-maxage=86400');
+  }
+}));
+
 app.use('/api', indexRouter);
 app.use('/api/asciiArt', asciiArtRouter);
 app.use('/api/register', registerRouter);
@@ -67,9 +75,9 @@ app.use('/api/posts', postsRouter);
 app.use('/api/taggedPosts', taggedPostsRouter);
 app.use('/api/accessToken', accessTokenRouter);
 
-
 app.use(tokenVerify);
 app.use('/api/user', userRouter);
+app.use('/api/accessTokenAuth', accessTokenAuthRouter);
 
 
 

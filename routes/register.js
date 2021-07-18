@@ -14,7 +14,7 @@ router.post('/', async function(req, res, next) {
     let user = await sequelizeDB["Users"].find(user_name);
     if(user){
         console.log(user);
-        res.send('The user name has already existed.');
+        res.send({ success: false, message: `The username has existed.`});
         return;
     }
 
@@ -32,7 +32,7 @@ router.post('/', async function(req, res, next) {
     sequelizeDB["Users"].create(user_name, hash)
     .then(post => {
         //res.json(post);
-        res.send('register successfully.');
+        res.send({ success: true, message: `register successfully.`});
     }).catch(next);
     
 });

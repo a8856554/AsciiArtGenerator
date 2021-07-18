@@ -57,11 +57,16 @@ router.post('/', async function(req, res, next) {
         res.json({
             success: true,
             message: 'Get Authentication and JWT , pekopeko.',
-            access_token: token,
-			id: user.id,
-            user_name: user.user_name,
-            firstName: user.firstName,
-            lastName: user.lastName,
+			result: {
+				access_token: token,
+				id: user.id,
+				user_name: user.user_name,
+				first_name: user.first_name,
+				last_name: user.last_name,
+				email: user.email,
+				createdAt: user.createdAt,
+				updatedAt: user.updatedAt
+			},
         });
         
     })

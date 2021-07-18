@@ -48,8 +48,15 @@ function init( sequelize){
       type: Sequelize.BIGINT,
       defaultValue: sequelize.literal('extract(epoch from now())'),
       allowNull: false
-    }
-    
+    },
+    width: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
+    height: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
     }, {
       // Other model options go here
 
@@ -84,13 +91,20 @@ async function create(user_id, title, context, image_path = ''){
  * @param {string} user_id user who creates this post.
  * @param {string} title post's title
  * @param {string} context post's context text
+ * @param {number} width the ascii art width (num of columns)
+ * @param {number} height the ascii art height (num of rows)
  * @param {string} image_path image_path is the path post's image refered to.
  * @param {array} tags a array of tags. tags are strings.
  */
- async function createWithTags(user_id, title, context, image_path = '', tags = []){
+ async function createWithTags(user_id, title, context, width=0, height=0, image_path = '', tags = []){
   console.log(tags);
 
-  let newPost = await model.create({ user_id: user_id, title: title, context: context, image_path:image_path });
+  if(width ===0 || height === 0){
+    console.log("Please provide wid and height of the ascii art context.");
+    return "Please provide wid and height of the ascii art context.";
+  }
+
+  let newPost = await model.create({ user_id: user_id, title: title, context: context, image_path:image_path , width:width, height:height});
   if(tags.length === 0)
     return newPost;
 
@@ -165,16 +179,16 @@ async function list(search_words = [], start){
   
   // if number start exists, SELECT from id < start. The smaller the id is, the older the record is.
   if (start)
-    where.push(`id < $${search_words.length + 1}`);
-  
+    where.push(`p.id < $${search_words.length + 1}`);
+
   const sql = `
-    SELECT *
-    FROM "Posts"
+    SELECT p.id, user_name, user_id, title, image_path, context, width, height, like_num, views, ts
+    FROM "Posts" p INNER JOIN "Users" u
+    ON p.user_id = u.id
     ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
     ORDER BY id DESC
-    LIMIT 20
+    LIMIT 10
   `;
-  
   let posts = await db.any(sql, [...search_words, start]);
   
   // if there is no record , return [].
@@ -210,6 +224,8 @@ async function list(search_words = [], start){
   return posts;
 }
 /*
+
+
 
 SELECT id, title, image_path, context, like_num, views, ts, user_id, tags
 FROM "Posts" p LEFT JOIN (
@@ -249,6 +265,21 @@ SELECT *
   FROM "PostTags" pt INNER JOIN "Tags" t
     ON pt."TagId" = t.id
 `
+
+EXPLAIN ANALYZE
+SELECT p.id, user_name, user_id, title, image_path, context, width, height, like_num, views, ts
+    FROM "Posts" p INNER JOIN "Users" u
+    ON p.user_id = u.id
+    WHERE p.title ILIKE '惠惠'
+    ORDER BY id DESC
+    LIMIT 10
+
+EXPLAIN ANALYZE
+SELECT p.id, user_name, user_id, title, image_path, context, width, height, like_num, views, ts
+    FROM (SELECT * FROM "Posts" WHERE title ILIKE '惠惠') p INNER JOIN "Users" u
+    ON p.user_id = u.id
+    ORDER BY id DESC
+    LIMIT 10
 */
 
 /**
@@ -320,6 +351,19 @@ async function deleteById(post_id){
   return db.any(sql, [post_id]);
 }
 
+/**
+ * find a post with post id.
+ *
+ * @param {string} id post id
+ */
+ async function find(id){
+  return model.findOne({ where: { id: id } })
+          .catch(function (error) {
+              console.log('Posts.findOne() occurs error：' + error.message);
+          });
+}
+
+
 export{
   model,
   name,
@@ -330,4 +374,6 @@ export{
   listWithTags,
   listByTags,
   deleteById,
+  find,
 }
+

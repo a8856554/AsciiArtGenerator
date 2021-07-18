@@ -7,7 +7,7 @@ router.get('/', async function(req, res, next) {
   if(!req.cookies.refresh_token)
     return res.json({ success: false, result: {}, message: 'Please provide a refresh_token'});
 
-	let refresh_token = req.cookies.refresh_token;
+  let refresh_token = req.cookies.refresh_token;
 
   jwt.verify(refresh_token, process.env.SECRET, function (err, decoded) {
     if (err) 
@@ -29,8 +29,31 @@ router.get('/', async function(req, res, next) {
     res.json({
       success: true,
       access_token: token,
+	  
     });
   })
+
+});
+
+/* clear the refresh_token */
+router.delete('/', async function(req, res, next) {
+  if(!req.cookies.refresh_token)
+    return res.json({ success: false, result: {}, message: 'Please provide a refresh_token'});
+
+  let refresh_token = req.cookies.refresh_token;
+  jwt.verify(refresh_token, process.env.SECRET, function (err, decoded) {
+    if (err) 
+      return res.json({success: false, message: 'Failed to authenticate refresh_token.'});
+    
+    if(decoded.type !== "refresh_token")
+      return res.json({success: false, message: 'You should provide a refresh_token.'});
+  
+	res.clearCookie('refresh_token');
+	res.json({
+      success: true,
+    });
+    
+  });
 
 });
 
