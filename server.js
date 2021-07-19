@@ -30,7 +30,7 @@ const corsOptions = {
     origin: [
         'http://localhost:3000',
       'http://localhost:3002',
-      'AsciiArtGenerator-dev.ap-east-1.elasticbeanstalk.com',
+      'http://asciiartgenerator-dev.ap-east-1.elasticbeanstalk.com',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: ['Content-Type', 'Authorization'],
