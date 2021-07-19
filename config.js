@@ -9,6 +9,7 @@ try {
             break;
         default: // 'staging' or 'production'
             process.env.DB_URL=`postgres://${process.env.RDS_USERNAME}:${process.env.RDS_PASSWORD}@${process.env.RDS_HOSTNAME}:${process.env.RDS_PORT}/${process.env.RDS_DB_NAME}`;
+            process.env.SECRET = process.env.PG_SECRET;
             break;
     }
 } catch (err) {
