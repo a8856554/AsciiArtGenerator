@@ -69,6 +69,10 @@ app.use(express.static(path.join(__dirname, 'build'), {
   }
 }));
 
+app.get('/*', function (request, response){
+  response.sendFile(path.join(__dirname, 'build', 'index.html'))
+});
+
 app.use('/api', indexRouter);
 app.use('/api/asciiArt', asciiArtRouter);
 app.use('/api/register', registerRouter);
