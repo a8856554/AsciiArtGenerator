@@ -16,7 +16,12 @@ function init( sequelize){
         tag_name: {
           type: DataTypes.STRING,
           allowNull: false
-        }
+        },
+        ts: {
+          type: Sequelize.BIGINT,
+          defaultValue: sequelize.literal('extract(epoch from now())'),
+          allowNull: false
+        },
       }, {
         // Other model options go here
 
@@ -32,8 +37,24 @@ function init( sequelize){
   return model;
 }
 
+/**
+ * list tags
+ * @param {number} limit the limited number of tags will be listed.
+ */
+async function listTags(limit = 50){
+  
+  const sql = `
+    SELECT t.tag_name
+    FROM "Tags" t
+    ORDER BY ts DESC
+    LIMIT $1
+  `;
+  return db.any(sql, [limit]);
+}
+
 export{
   model,
   name,
   init,
+  listTags,
 }

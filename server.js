@@ -18,6 +18,7 @@ import postsRouter from './routes/posts.js';
 import taggedPostsRouter from './routes/taggedPosts.js';
 import accessTokenRouter from './routes/accessToken.js';
 import accessTokenAuthRouter from './routes/accessTokenAuthentication.js';
+import tagsRouter from './routes/tags.js';
 
 import tensorflowModel from './src/javascript/loadTFModel.js';
 import tokenVerify from './middleware/tokenVerify.js';
@@ -75,6 +76,7 @@ app.use('/api/login', loginRouter);
 app.use('/api/posts', postsRouter);
 app.use('/api/taggedPosts', taggedPostsRouter);
 app.use('/api/accessToken', accessTokenRouter);
+app.use('/api/tags', tagsRouter);
 
 app.use(tokenVerify);
 app.use('/api/user', userRouter);

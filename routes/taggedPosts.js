@@ -15,9 +15,8 @@ let router = express.Router();
   let {search_tags, start} = req.query;
 
   if(search_tags){
-    search_tags = search_tags.split("#");
-    // Remove the 1st element, since the 1st element in search_tags is "".
-    search_tags.shift();
+    search_tags = search_tags.split(" ");
+    console.log(search_tags)
   }
   else
     search_tags = [];

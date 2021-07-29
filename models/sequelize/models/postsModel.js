@@ -302,8 +302,10 @@ async function listByTags(search_tags = [], start){
   if (start)
     where.push(`pt."PostId" < $${search_tags.length + 2}`);
   const sql = `
-    SELECT * from "Posts"
-    WHERE id in(
+    SELECT p.id, user_name, user_id, title, image_path, context, width, height, like_num, views, ts
+    FROM "Posts" p INNER JOIN "Users" u
+    ON p.user_id = u.id
+    WHERE p.id in(
       SELECT "PostId"
       FROM "PostTags" pt INNER JOIN "Tags" t
         ON pt."TagId" = t.id AND ${where.length ? where.join(' AND ') : ''}
@@ -316,6 +318,7 @@ async function listByTags(search_tags = [], start){
 }
 
 /**
+
 
 SELECT * from "Posts"
 WHERE id in(
