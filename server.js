@@ -69,7 +69,10 @@ app.use(express.static(path.join(__dirname, 'build'), {
   }
 }));
 
-app.get('/*', function (request, response){
+app.get('/*', function (request, response, next){
+  if (request.url.includes("api")) 
+    return next();
+
   response.sendFile(path.join(__dirname, 'build', 'index.html'))
 });
 
