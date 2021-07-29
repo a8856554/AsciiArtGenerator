@@ -63,7 +63,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors(corsOptions));
 
 
-app.use(express.static('build', {
+app.use(express.static(path.join(__dirname, 'build'), {
   setHeaders: (res, path, stat) => {
       res.set('Cache-Control', 'public, s-maxage=86400');
   }
