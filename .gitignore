@@ -105,6 +105,7 @@ dist
 
 # config file
 env.sh
+config
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml

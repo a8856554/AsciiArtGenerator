@@ -31,7 +31,7 @@ const corsOptions = {
     origin: [
         'http://localhost:3000',
       'http://localhost:3002',
-      'http://asciiartgenerator-dev.ap-east-1.elasticbeanstalk.com',
+      'http://asciiartgenerator-dev.us-west-1.elasticbeanstalk.com',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -69,6 +69,7 @@ app.use(express.static(path.join(__dirname, 'build'), {
   }
 }));
 
+// provide index.html file when front-end GET request incomes.
 app.get('/*', function (request, response, next){
   if (request.url.includes("api")) 
     return next();
